@@ -11,6 +11,32 @@ web tidak mengakses PostgreSQL secara langsung.
 
 Repository: `git@github.com:Basith-08/tracklume-web.git`
 
+## Tentang Tracklume
+
+Tracklume adalah aplikasi web issue tracker untuk tim kecil dan proyek produk.
+Aplikasi ini membantu pengguna mencatat pekerjaan, bug, dan ide fitur dalam
+satu tempat, kemudian mengelolanya berdasarkan status, prioritas, tipe,
+assignee, dan due date.
+
+Alur utama pengguna adalah:
+
+1. Login atau membuat akun.
+2. Membuat atau memilih project.
+3. Membuat issue dengan tipe task, bug, atau feature.
+4. Mengatur issue melalui daftar issue dan Kanban board.
+5. Memantau progres melalui dashboard.
+6. Mengelola anggota project berdasarkan role Owner, Admin, Member, atau Viewer.
+
+Tracklume terdiri dari frontend ini dan backend REST API pada repository
+terpisah. Frontend bertanggung jawab atas tampilan, navigasi, form, cache
+server state, dan pengalaman pengguna. Backend tetap menjadi sumber data serta
+sumber authorization utama; frontend tidak pernah mengakses PostgreSQL secara
+langsung.
+
+Project ini ditujukan untuk demo end-to-end dan penggunaan internal skala
+kecil. Fitur kolaborasi realtime, komentar, attachment, notifikasi, OAuth,
+sprint, dan billing sengaja berada di luar cakupan MVP.
+
 ## Fitur MVP
 
 - Login, register, session HTTP-only cookie, logout, profile, dan ganti password.
