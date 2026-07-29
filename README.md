@@ -9,7 +9,7 @@ Tracklume adalah frontend issue tracker untuk task, bug, dan feature request.
 Frontend ini hanya berkomunikasi dengan REST API backend. Browser dan container
 web tidak mengakses PostgreSQL secara langsung.
 
-Repository: `git@github.com:Basith-08/tracklume-web.git`
+Repository: [Basith-08/tracklume-web](https://github.com/Basith-08/tracklume-web)
 
 ## Tentang Tracklume
 
@@ -34,8 +34,8 @@ sumber authorization utama; frontend tidak pernah mengakses PostgreSQL secara
 langsung.
 
 Project ini ditujukan untuk demo end-to-end dan penggunaan internal skala
-kecil. Fitur kolaborasi realtime, komentar, attachment, notifikasi, OAuth,
-sprint, dan billing sengaja berada di luar cakupan MVP.
+kecil. Detail fitur yang belum termasuk dalam MVP tersedia pada bagian
+Non-goals.
 
 ## Fitur MVP
 
@@ -64,11 +64,13 @@ src/
 e2e/                  # Playwright demo flow
 ```
 
-## Requirement dan local development
+## Prasyarat dan local development
 
 - Node.js 20+
 - npm 10+
 - Backend API tersedia di `http://localhost:8080`
+
+Dari root repository, install dependency lalu jalankan server development:
 
 ```bash
 npm ci
@@ -117,15 +119,21 @@ Backend memakai prefix `/api/v1` dan envelope `{ data }` atau collection
 `{ data, meta }`. Adapter frontend menangani perbedaan field backend seperti
 `user_id`, dashboard aggregates, dan project role.
 
-Backend demo saat ini menyediakan:
-
-```text
-owner@issueflow.local
-Password123!
-```
-
 Email demo tetap memakai domain `issueflow.local` karena mengikuti seed backend
 yang belum di-rename.
+
+## Demo flow
+
+Untuk demo end-to-end, login menggunakan akun owner, buka demo project, lalu
+buat issue baru. Issue dapat diedit dari detail atau dipindahkan antar kolom
+Kanban. Dashboard akan memperbarui ringkasan issue setelah perubahan berhasil.
+
+```text
+Email:    owner@issueflow.local
+Password: Password123!
+```
+
+Jangan menggunakan credential demo ini untuk production.
 
 ## Testing
 
@@ -166,24 +174,22 @@ ghcr.io/${GHCR_OWNER}/tracklume-web:${IMAGE_TAG}
 Compose memakai network external Traefik `edge`, network internal
 `tracklume-web-internal`, dan hostname `tracklume.${PLATFORM_DOMAIN}`.
 
-## Push ke GitHub
+## Repository public dan package GHCR
 
-Workspace ini tidak memiliki metadata Git yang usable, jadi jalankan dari root
-repository setelah memastikan GitHub repository sudah dibuat:
+Repository ini tersedia di GitHub:
+`git@github.com:Basith-08/tracklume-web.git`.
+
+Untuk mengambil source code:
 
 ```bash
-git init
-git branch -M main
-git remote add origin git@github.com:Basith-08/tracklume-web.git
-git add -A
-git commit -m "feat: build Tracklume frontend"
-git push -u origin main
+git clone git@github.com:Basith-08/tracklume-web.git
+cd tracklume-web
 ```
 
-Pastikan repository visibility di GitHub diset ke `Public`. Package GHCR juga
-perlu diset `Public` bila VPS akan pull image tanpa login GHCR.
+Source repository sebaiknya diset `Public` sesuai tujuan proyek ini. Package
+GHCR juga perlu diset `Public` bila VPS akan pull image tanpa login GHCR.
 
-## GitHub Actions
+## Deployment otomatis
 
 Workflow `.github/workflows/deploy.yml` menjalankan format check, lint,
 typecheck, unit/component test, production build, build image, push GHCR, dan
