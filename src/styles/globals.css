@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 220 20% 97%;
+  --surface: 0 0% 100%;
+  --border: 220 16% 90%;
+  --foreground: 222 34% 14%;
+  --muted: 220 18% 94%;
+  --muted-foreground: 220 10% 46%;
+  --primary: 239 67% 58%;
+  --destructive: 0 72% 52%;
+}
+.dark {
+  --background: 222 27% 9%;
+  --surface: 222 24% 13%;
+  --border: 220 17% 23%;
+  --foreground: 220 20% 96%;
+  --muted: 220 18% 18%;
+  --muted-foreground: 220 10% 64%;
+  --primary: 239 76% 69%;
+  --destructive: 0 74% 62%;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  min-width: 320px;
+}
+body {
+  margin: 0;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: Arial, Helvetica, sans-serif;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+::selection {
+  background: hsl(var(--primary) / 0.2);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

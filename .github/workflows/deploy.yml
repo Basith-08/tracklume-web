@@ -1,0 +1,127 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit SHA to redeploy (rollback)"
+        required: false
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: deploy-tracklume-web
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha || github.sha }}
+
+      - name: Resolve deploy SHA
+        id: sha
+        run: echo "sha=${{ inputs.sha || github.sha }}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        run: |
+          image_owner="$(printf '%s' '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+          docker build -t "ghcr.io/${image_owner}/tracklume-web:${{ steps.sha.outputs.sha }}" .
+          docker push "ghcr.io/${image_owner}/tracklume-web:${{ steps.sha.outputs.sha }}"
+
+      - name: Prepare production directory
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_DEPLOY_USER }}
+          key: ${{ secrets.PROD_DEPLOY_KEY }}
+          script: |
+            app_dir="${{ secrets.PROD_APP_DIR }}"
+            if [ -z "$app_dir" ] || [ "$app_dir" = "/" ]; then
+              echo "PROD_APP_DIR is empty or unsafe"
+              exit 1
+            fi
+            mkdir -p "$app_dir"
+
+      - name: Upload production Compose file
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_DEPLOY_USER }}
+          key: ${{ secrets.PROD_DEPLOY_KEY }}
+          source: "compose.yaml"
+          target: ${{ secrets.PROD_APP_DIR }}
+
+      - name: Deploy to production
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_DEPLOY_USER }}
+          key: ${{ secrets.PROD_DEPLOY_KEY }}
+          script: |
+            app_dir="${{ secrets.PROD_APP_DIR }}"
+            if [ -z "$app_dir" ] || [ "$app_dir" = "/" ]; then
+              echo "PROD_APP_DIR is empty or unsafe"
+              exit 1
+            fi
+            ghcr_owner="$(printf '%s' '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+            umask 077
+            cat > "$app_dir/.env" <<EOF
+            IMAGE_TAG=${{ steps.sha.outputs.sha }}
+            PLATFORM_DOMAIN=asfinebasith.my.id
+            GHCR_OWNER=${ghcr_owner}
+            NEXT_PUBLIC_APP_NAME=Tracklume
+            NEXT_PUBLIC_API_URL=https://api-tracklume.asfinebasith.my.id/api/v1
+            INTERNAL_API_URL=https://api-tracklume.asfinebasith.my.id/api/v1
+            AUTH_COOKIE_NAME=tracklume_session
+            AUTH_COOKIE_SECURE=true
+            EOF
+            cd "$app_dir"
+            if ! docker network inspect edge >/dev/null 2>&1; then
+              echo "Docker network 'edge' is missing; configure Traefik before deploying"
+              exit 1
+            fi
+            docker compose pull
+            docker compose up -d
+            container_id="$(docker compose ps -q web)"
+            for attempt in $(seq 1 30); do
+              health="$(docker inspect --format '{{.State.Health.Status}}' "$container_id" 2>/dev/null || true)"
+              if [ "$health" = "healthy" ]; then
+                exit 0
+              fi
+              if [ "$health" = "unhealthy" ]; then
+                docker compose logs --tail=100 web
+                exit 1
+              fi
+              sleep 2
+            done
+            docker compose logs --tail=100 web
+            exit 1
