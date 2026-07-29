@@ -112,16 +112,26 @@ jobs:
             docker compose pull
             docker compose up -d
             container_id="$(docker compose ps -q web)"
-            for attempt in $(seq 1 30); do
-              health="$(docker inspect --format '{{.State.Health.Status}}' "$container_id" 2>/dev/null || true)"
+            if [ -z "$container_id" ]; then
+              docker compose ps
+              docker compose logs --tail=100 web
+              echo "Could not resolve the web container ID"
+              exit 1
+            fi
+            docker compose ps
+            for attempt in $(seq 1 45); do
+              health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no-healthcheck{{end}}' "$container_id" 2>/dev/null || true)"
+              echo "Tracklume health check ${attempt}/45: ${health}"
               if [ "$health" = "healthy" ]; then
                 exit 0
               fi
-              if [ "$health" = "unhealthy" ]; then
+              if [ "$health" = "unhealthy" ] || [ "$health" = "no-healthcheck" ]; then
+                docker inspect --format '{{json .State.Health}}' "$container_id" || true
                 docker compose logs --tail=100 web
                 exit 1
               fi
               sleep 2
             done
+            docker inspect --format '{{json .State.Health}}' "$container_id" || true
             docker compose logs --tail=100 web
             exit 1
