@@ -204,15 +204,16 @@ PLATFORM_DOMAIN=asfinebasith.my.id
 GHCR_OWNER=basith-08
 NEXT_PUBLIC_APP_NAME=Tracklume
 NEXT_PUBLIC_API_URL=https://api-tracklume.asfinebasith.my.id/api/v1
-INTERNAL_API_URL=https://api-tracklume.asfinebasith.my.id/api/v1
+INTERNAL_API_URL=http://api:8080/api/v1
 AUTH_COOKIE_NAME=tracklume_session
 AUTH_COOKIE_SECURE=true
 ```
 
-Jika backend dan frontend berada pada network Docker yang sama, gunakan nama
-service backend untuk `INTERNAL_API_URL`, misalnya
-`http://<backend-service>:8080/api/v1`. Jangan gunakan `localhost` dari dalam
-container web karena itu menunjuk ke container web sendiri.
+Pada deployment VPS, backend dan frontend berada pada network Docker external
+`edge`. Karena service backend bernama `api`, gunakan
+`http://api:8080/api/v1` untuk `INTERNAL_API_URL`. Jangan gunakan URL publik
+HTTPS untuk komunikasi server-to-server atau `localhost` dari dalam container
+web; keduanya dapat menyebabkan koneksi timeout pada konfigurasi VPS tertentu.
 
 Deploy manual:
 

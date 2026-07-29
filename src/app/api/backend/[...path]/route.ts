@@ -63,6 +63,7 @@ async function forward(
       headers,
       body,
       cache: "no-store",
+      signal: AbortSignal.timeout(5_000),
     });
     const responseText = await upstream.text();
     let responseBody: unknown = responseText;
