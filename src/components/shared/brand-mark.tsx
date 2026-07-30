@@ -17,7 +17,7 @@ export function BrandMark({
     <span
       aria-hidden="true"
       className={cn(
-        "inline-grid shrink-0 place-items-center rounded-[9px] bg-primary text-white",
+        "inline-grid shrink-0 place-items-center bg-primary text-white",
         sizeClasses[size],
         className,
       )}

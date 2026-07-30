@@ -36,7 +36,7 @@ export default function ProfileSettingsPage() {
       <PageHeader
         eyebrow="Account"
         title="Profile settings"
-        description="Manage how your identity appears across Tracklume."
+        description="Update the name and password used across your projects."
       />
       <div className="grid max-w-4xl gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <section className="rounded-xl border border-border bg-surface p-5 sm:p-6">
@@ -45,7 +45,7 @@ export default function ProfileSettingsPage() {
             <div>
               <h2 className="font-semibold">Profile</h2>
               <p className="text-xs text-muted-foreground">
-                Visible to project members.
+                Visible to people in your projects.
               </p>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function ProfileSettingsPage() {
             <div>
               <h2 className="font-semibold">Password</h2>
               <p className="text-xs text-muted-foreground">
-                Use a unique password for your account.
+                Keep your account protected with a unique password.
               </p>
             </div>
           </div>

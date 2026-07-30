@@ -73,7 +73,7 @@ export default function MembersPage() {
       <PageHeader
         eyebrow="People"
         title="Members"
-        description="Control who can see and move work in this project."
+        description="Add people and set the access they need for this project."
       />
       {canManage && (
         <form
@@ -124,8 +124,8 @@ export default function MembersPage() {
       ) : !members.data?.data.length ? (
         <EmptyState
           icon={UserPlus}
-          title="No members yet"
-          description="Add teammates by their registered email address."
+          title="No additional members"
+          description="Add a registered user by email to start working together."
         />
       ) : (
         <div className="overflow-hidden rounded-xl border border-border bg-surface">

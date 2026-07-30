@@ -43,7 +43,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex min-h-screen items-center justify-center p-6">
         <ErrorState
-          message="The Tracklume API is unavailable."
+          message="We couldn't connect to Tracklume. Try again in a moment."
           onRetry={() => query.refetch()}
         />
       </div>

@@ -168,7 +168,7 @@ export default function IssueDetailPage() {
             ) : (
               <EmptyState
                 title="No activity yet"
-                description="Updates to this issue will appear here."
+                description="Changes to this issue will appear here."
               />
             )}
           </div>

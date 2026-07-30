@@ -77,10 +77,10 @@ export function IssueForm({
         <div className="mb-6 flex items-start justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              {issue ? "Update issue" : "New issue"}
+              {issue ? "Edit issue" : "New issue"}
             </p>
             <h2 id="issue-form-title" className="mt-1 text-xl font-semibold">
-              {issue ? issue.identifier : "Create an issue"}
+              {issue ? issue.identifier : "Add an issue"}
             </h2>
           </div>
           <button
@@ -101,7 +101,7 @@ export function IssueForm({
             <Input
               id="issue-title"
               autoFocus
-              placeholder="What needs to happen?"
+              placeholder="Summarize the work"
               {...form.register("title")}
             />
             <FieldError>{form.formState.errors.title?.message}</FieldError>
@@ -115,7 +115,7 @@ export function IssueForm({
             </Label>
             <Textarea
               id="issue-description"
-              placeholder="Add context, acceptance criteria, or links..."
+              placeholder="Add context, acceptance criteria, or useful links..."
               {...form.register("description")}
             />
             <FieldError>
@@ -135,8 +135,8 @@ export function IssueForm({
               <Label htmlFor="issue-status">Status</Label>
               <Select id="issue-status" {...form.register("status")}>
                 <option value="backlog">Backlog</option>
-                <option value="todo">To do</option>
-                <option value="in_progress">In progress</option>
+                <option value="todo">To Do</option>
+                <option value="in_progress">In Progress</option>
                 <option value="done">Done</option>
                 <option value="cancelled">Cancelled</option>
               </Select>

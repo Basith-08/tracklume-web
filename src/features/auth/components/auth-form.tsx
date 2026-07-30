@@ -9,6 +9,7 @@ import { ArrowRight, LockKeyhole, UserRound } from "lucide-react";
 import { BrandMark } from "@/components/shared/brand-mark";
 import { DemoLoginButton } from "@/features/auth/components/demo-login-button";
 import { Button, FieldError, Input, Label } from "@/components/ui";
+import { BrandMark } from "@/components/shared/brand-mark";
 import { ApiError } from "@/lib/api/client";
 import { resources } from "@/lib/api/resources";
 import {
@@ -27,7 +28,7 @@ export function AuthFrame({
 }) {
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto flex min-h-screen max-w-6xl">
+      <div className="flex min-h-screen">
         <aside className="relative hidden w-[42%] overflow-hidden bg-slate-950 p-10 text-white lg:flex lg:flex-col lg:justify-between">
           <div className="relative z-10 flex items-center gap-2 text-sm font-semibold tracking-tight">
             <BrandMark />
@@ -50,8 +51,14 @@ export function AuthFrame({
           <div className="relative z-10 text-xs text-slate-400">
             Clear ownership · Fewer loose ends
           </div>
-          <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full border border-indigo-400/30 bg-indigo-500/20 blur-3xl" />
-          <div className="absolute right-16 top-20 h-56 w-56 rounded-full border border-cyan-300/10" />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-24 right-12 h-px w-64 bg-indigo-400/25"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-[5.9rem] right-[18.5rem] h-2 w-2 rounded-full bg-indigo-300/70"
+          />
         </aside>
         <section className="flex flex-1 items-center justify-center px-6 py-12 sm:px-12">
           <div className="w-full max-w-sm">
@@ -156,8 +163,8 @@ export function LoginForm() {
             role="alert"
           >
             {mutation.error instanceof ApiError
-              ? authErrorMessage(mutation.error, "We couldn't sign you in.")
-              : "Unable to sign in. Try again."}
+              ? mutation.error.message
+              : "We couldn't sign you in. Try again."}
           </p>
         )}
         <Button type="submit" className="w-full" loading={mutation.isPending}>
@@ -166,7 +173,7 @@ export function LoginForm() {
       </form>
       {process.env.NODE_ENV === "development" && (
         <div className="mt-6 rounded-lg border border-dashed border-border bg-muted/50 p-3 text-xs text-muted-foreground">
-          <strong className="text-foreground">Local development seed</strong>
+          <strong className="text-foreground">Demo account</strong>
           <br />
           owner@tracklume.local · Password123!
         </div>
@@ -259,11 +266,8 @@ export function RegisterForm() {
             role="alert"
           >
             {mutation.error instanceof ApiError
-              ? authErrorMessage(
-                  mutation.error,
-                  "We couldn't create your account.",
-                )
-              : "Unable to create your account."}
+              ? mutation.error.message
+              : "We couldn't create your account. Try again."}
           </p>
         )}
         <Button

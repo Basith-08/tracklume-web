@@ -60,7 +60,7 @@ export default function ProjectsPage() {
       <PageHeader
         eyebrow="Workspace"
         title="Projects"
-        description="A clear starting point for every piece of work."
+        description="Keep projects, owners, and active work in one place."
         action={
           <Button
             onClick={() => {
@@ -81,8 +81,8 @@ export default function ProjectsPage() {
       ) : projects.data?.data.length === 0 ? (
         <EmptyState
           icon={FolderKanban}
-          title="Your workspace is ready"
-          description="Create your first project to start tracking work with your team."
+          title="No projects yet"
+          description="Create a project to give your team one place to plan and ship work."
           action={
             <Button onClick={() => setFormOpen(true)}>
               <Plus className="h-4 w-4" />
@@ -171,7 +171,7 @@ function ProjectCard({
           <ArrowUpRight className="h-4 w-4 opacity-0 transition group-hover:opacity-100" />
         </h2>
         <p className="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-muted-foreground">
-          {project.description || "No description yet."}
+          {project.description || "No description provided."}
         </p>
       </Link>
       <div className="mt-5 flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">

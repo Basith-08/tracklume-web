@@ -46,7 +46,7 @@ export function RetryButton({ onRetry }: { onRetry: () => void }) {
   return (
     <Button variant="outline" size="sm" onClick={onRetry}>
       <RefreshCw className="h-3.5 w-3.5" />
-      Retry
+      Try again
     </Button>
   );
 }

@@ -37,12 +37,12 @@ export default function OverviewPage() {
     <>
       <PageHeader
         eyebrow="Overview"
-        title="Project pulse"
-        description="A compact view of what is moving, what is stuck, and what needs attention."
+        title="Overview"
+        description="See what is moving, overdue, and due next in this project."
       />
       {error || !data ? (
         <ErrorState
-          message="Dashboard data is not available yet."
+          message="We couldn't load the project overview."
           onRetry={() => refetch()}
         />
       ) : (
@@ -79,9 +79,9 @@ export default function OverviewPage() {
             <div className="rounded-xl border border-border bg-surface p-5">
               <div className="mb-5 flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold">Work distribution</h2>
+                  <h2 className="font-semibold">Work breakdown</h2>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Where issues are in the workflow.
+                    Where issues sit across this project.
                   </p>
                 </div>
                 <CircleDot className="h-5 w-5 text-primary" />
@@ -117,9 +117,9 @@ export default function OverviewPage() {
             <div className="rounded-xl border border-border bg-surface p-5">
               <div className="mb-5 flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold">Recently updated</h2>
+                  <h2 className="font-semibold">Recent updates</h2>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    The latest movement in this project.
+                    The latest changes to project issues.
                   </p>
                 </div>
                 <Activity className="h-5 w-5 text-primary" />
@@ -143,7 +143,7 @@ export default function OverviewPage() {
                   ))
                 ) : (
                   <p className="py-10 text-center text-sm text-muted-foreground">
-                    No activity yet.
+                    No updates yet.
                   </p>
                 )}
               </div>
