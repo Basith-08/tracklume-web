@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { resources } from "@/lib/api/resources";
 import { queryKeys } from "@/lib/api/queries";
 import { ErrorState, Spinner } from "@/components/ui";
@@ -15,6 +16,15 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     queryFn: resources.me,
     retry: false,
   });
+  useEffect(() => {
+    if (
+      query.error instanceof ApiError &&
+      query.error.status === 401 &&
+      pathname !== "/login"
+    ) {
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+    }
+  }, [pathname, query.error, router]);
   if (query.isLoading)
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -22,8 +32,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       </div>
     );
   if (query.error instanceof ApiError && query.error.status === 401) {
-    if (typeof window !== "undefined" && pathname !== "/login")
-      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Spinner />
@@ -34,7 +42,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex min-h-screen items-center justify-center p-6">
         <ErrorState
-          message="The Tracklume API is unavailable."
+          message="We couldn't connect to Tracklume. Try again in a moment."
           onRetry={() => query.refetch()}
         />
       </div>
@@ -49,6 +57,9 @@ export function PublicOnly({ children }: { children: React.ReactNode }) {
     queryFn: resources.me,
     retry: false,
   });
+  useEffect(() => {
+    if (query.data) router.replace("/projects");
+  }, [query.data, router]);
   if (query.isLoading)
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -56,7 +67,6 @@ export function PublicOnly({ children }: { children: React.ReactNode }) {
       </div>
     );
   if (query.data) {
-    router.replace("/projects");
     return null;
   }
   return <>{children}</>;
