@@ -113,12 +113,19 @@ jobs:
               exit 1
             fi
             docker compose pull
-            docker compose up -d
+            docker compose up -d --force-recreate web
             container_id="$(docker compose ps -q web)"
             if [ -z "$container_id" ]; then
               docker compose ps
               docker compose logs --tail=100 web
               echo "Could not resolve the web container ID"
+              exit 1
+            fi
+            container_env="$(docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$container_id")"
+            if ! printf '%s\n' "$container_env" | grep -q '^DEMO_EMAIL=' || \
+              ! printf '%s\n' "$container_env" | grep -q '^DEMO_PASSWORD='; then
+              echo "Demo credentials are missing from the web container environment"
+              docker compose logs --tail=100 web
               exit 1
             fi
             docker compose ps
