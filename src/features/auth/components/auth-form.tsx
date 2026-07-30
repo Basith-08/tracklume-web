@@ -9,7 +9,6 @@ import { ArrowRight, LockKeyhole, UserRound } from "lucide-react";
 import { BrandMark } from "@/components/shared/brand-mark";
 import { DemoLoginButton } from "@/features/auth/components/demo-login-button";
 import { Button, FieldError, Input, Label } from "@/components/ui";
-import { BrandMark } from "@/components/shared/brand-mark";
 import { ApiError } from "@/lib/api/client";
 import { resources } from "@/lib/api/resources";
 import {
