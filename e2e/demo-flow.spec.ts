@@ -4,7 +4,7 @@ test("demo workspace flow: login, create, move, inspect, logout", async ({
   page,
 }) => {
   await page.goto("/login");
-  await page.getByLabel("Email").fill("owner@issueflow.local");
+  await page.getByLabel("Email").fill("owner@tracklume.local");
   await page.getByLabel("Password").fill("Password123!");
   await page.getByRole("button", { name: /sign in/i }).click();
   await expect(page).toHaveURL(/\/projects$/);

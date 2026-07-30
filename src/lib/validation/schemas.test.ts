@@ -13,7 +13,7 @@ describe("validation schemas", () => {
     );
     expect(
       loginSchema.safeParse({
-        email: "owner@issueflow.local",
+        email: "owner@tracklume.local",
         password: "secret",
       }).success,
     ).toBe(true);

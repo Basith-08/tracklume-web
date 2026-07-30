@@ -8,6 +8,7 @@
 Tracklume adalah aplikasi web issue tracker untuk tim kecil dan proyek produk.
 Aplikasi ini membantu pengguna mencatat pekerjaan, bug, dan ide fitur, lalu
 mengelolanya berdasarkan status, prioritas, tipe, assignee, dan due date.
+Tagline produk: **Track tasks, bugs, and product ideas clearly.**
 
 Repository ini berisi frontend Tracklume. Data aplikasi disediakan oleh REST
 API backend pada repository terpisah. Frontend tidak mengakses PostgreSQL secara
@@ -19,7 +20,7 @@ Repository: [Basith-08/tracklume-web](https://github.com/Basith-08/tracklume-web
 
 Tracklume dibuat untuk menyediakan alur kerja yang ringkas dan mudah dipahami:
 
-1. Pengguna login atau membuat akun.
+1. Pengunjung membuat akun baru atau mencoba demo read-only.
 2. Pengguna membuat atau memilih project.
 3. Task, bug, dan feature request dibuat sebagai issue.
 4. Issue dikelola melalui daftar issue atau Kanban board.
@@ -38,6 +39,10 @@ authorization utama.
 - Kanban: Backlog, To Do, In Progress, Done, dan Cancelled dengan drag-and-drop.
 - Issues: search, filter, sort, pagination, create, edit, detail, delete, dan activity history.
 - Members: tambah anggota melalui email, ubah role, dan remove member.
+- Onboarding publik: landing page, registration sebagai flow utama, dan demo
+  viewer yang tidak dapat mengubah data bersama.
+- Platform admin: overview, user directory, pencarian/filter/pagination,
+  detail akun, deactivate/reactivate, soft delete, dan restore.
 - UX: light/dark mode, responsive layout, loading state, error state, empty state,
   toast, confirmation dialog, dan keyboard-friendly interaction.
 
@@ -136,16 +141,19 @@ bergantung pada URL browser.
 
 ## Environment variables
 
-| Variable               | Development                               | Production             |
-| ---------------------- | ----------------------------------------- | ---------------------- |
-| `IMAGE_TAG`            | `local`                                   | commit SHA image       |
-| `PLATFORM_DOMAIN`      | `example.com`                             | domain platform        |
-| `GHCR_OWNER`           | `basith-08`                               | owner GHCR lowercase   |
-| `NEXT_PUBLIC_APP_NAME` | `Tracklume`                               | `Tracklume`            |
-| `NEXT_PUBLIC_API_URL`  | `http://localhost:8080/api/v1`            | URL API publik         |
-| `INTERNAL_API_URL`     | `http://host.docker.internal:8080/api/v1` | URL API dari container |
-| `AUTH_COOKIE_NAME`     | `tracklume_session`                       | `tracklume_session`    |
-| `AUTH_COOKIE_SECURE`   | `false`                                   | `true` pada HTTPS      |
+| Variable                   | Development                               | Production             |
+| -------------------------- | ----------------------------------------- | ---------------------- |
+| `IMAGE_TAG`                | `local`                                   | commit SHA image       |
+| `PLATFORM_DOMAIN`          | `example.com`                             | domain platform        |
+| `GHCR_OWNER`               | `basith-08`                               | owner GHCR lowercase   |
+| `NEXT_PUBLIC_APP_NAME`     | `Tracklume`                               | `Tracklume`            |
+| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:8080/api/v1`            | URL API publik         |
+| `NEXT_PUBLIC_API_URL`      | `http://localhost:8080/api/v1`            | URL API publik         |
+| `INTERNAL_API_URL`         | `http://host.docker.internal:8080/api/v1` | URL API dari container |
+| `AUTH_COOKIE_NAME`         | `tracklume_session`                       | `tracklume_session`    |
+| `AUTH_COOKIE_SECURE`       | `false`                                   | `true` pada HTTPS      |
+| `DEMO_EMAIL`               | `demo@tracklume.local`                    | akun viewer backend    |
+| `DEMO_PASSWORD`            | `DemoTracklume!`                          | credential runtime     |
 
 Mulai dari template berikut:
 
@@ -161,49 +169,90 @@ PLATFORM_DOMAIN=asfinebasith.my.id
 GHCR_OWNER=basith-08
 NEXT_PUBLIC_APP_NAME=Tracklume
 NEXT_PUBLIC_API_URL=https://api-tracklume.asfinebasith.my.id/api/v1
-INTERNAL_API_URL=https://api-tracklume.asfinebasith.my.id/api/v1
+NEXT_PUBLIC_API_BASE_URL=https://api-tracklume.asfinebasith.my.id/api/v1
+INTERNAL_API_URL=http://api:8080/api/v1
 AUTH_COOKIE_NAME=tracklume_session
 AUTH_COOKIE_SECURE=true
+DEMO_EMAIL=demo@tracklume.local
+DEMO_PASSWORD=DemoTracklume!
 ```
 
 Jangan commit `.env`, JWT secret, private key, atau credential backend.
 
-## Demo
+## Public onboarding dan demo
 
-Gunakan akun seed backend berikut untuk alur demo:
+Halaman `/` adalah entry point publik. Pengguna baru mengikuti alur:
 
 ```text
-Email:    owner@issueflow.local
-Password: Password123!
+Landing page → Create an account → Login → Create project → Add issues
 ```
 
-Email masih menggunakan domain `issueflow.local` karena mengikuti seed backend
-yang belum di-rename. Jangan gunakan credential ini untuk production.
+Pengunjung yang hanya ingin melihat produk dapat memilih **Try the read-only
+demo**. Tombol ini memanggil route server-side Next.js, sehingga credential
+demo tidak pernah dikirim ke browser dan token tetap berada di HTTP-only cookie.
 
-Demo flow yang disarankan:
+Backend harus menyediakan akun berikut sebagai viewer pada project demo:
 
-1. Login sebagai owner.
-2. Buka demo project.
-3. Buat issue baru.
-4. Edit issue dari detail.
-5. Pindahkan issue antar kolom Kanban.
-6. Periksa perubahan pada dashboard dan activity history.
-7. Logout.
+```text
+Email:    demo@tracklume.local
+Password: DemoTracklume!
+```
+
+Akun demo viewer tidak dapat membuat, mengubah, atau menghapus issue. Seed
+backend saat ini perlu ditambahkan/diubah agar akun tersebut benar-benar ada;
+frontend tidak membuat akun demo secara otomatis. Untuk local development,
+seed owner backend tetap dapat digunakan:
+
+```text
+owner@tracklume.local · Password123!
+```
+
+Jangan gunakan akun owner bersama untuk demo publik.
+
+Demo flow:
+
+1. Buka landing page.
+2. Pilih `Try the read-only demo`.
+3. Buka project demo dan lihat overview, board, issues, serta activity.
+4. Untuk alur write-enabled, pilih `Create an account`.
+
+## Platform admin
+
+Platform admin berbeda dari role project. Hanya user dengan
+`platform_role=superadmin` yang dapat membuka:
+
+- `/admin` untuk ringkasan user, project, dan issue.
+- `/admin/users` untuk search, filter status, pagination, dan deactivate/reactivate.
+- `/admin/users/{userID}` untuk detail support, soft delete, dan restore.
+
+Backend tetap melakukan authorization. Frontend hanya mengatur route guard dan
+menyembunyikan aksi yang tidak relevan. Buat superadmin dari repository
+backend, bukan dengan credential yang di-hard-code:
+
+```bash
+ADMIN_BOOTSTRAP_PASSWORD='choose-a-strong-password' \
+  go run ./cmd/admin create --email admin@example.com --name 'Platform Admin'
+```
+
+Jangan menjadikan superadmin sebagai member otomatis semua project.
 
 ## Route utama
 
-| Route                                    | Kegunaan              |
-| ---------------------------------------- | --------------------- |
-| `/login`                                 | Login                 |
-| `/register`                              | Registrasi            |
-| `/projects`                              | Daftar project        |
-| `/projects/[projectId]`                  | Overview project      |
-| `/projects/[projectId]/board`            | Kanban board          |
-| `/projects/[projectId]/issues`           | Issue list            |
-| `/projects/[projectId]/issues/[issueId]` | Issue detail          |
-| `/projects/[projectId]/members`          | Project members       |
-| `/projects/[projectId]/settings`         | Project settings      |
-| `/settings/profile`                      | User profile settings |
+| Route                                    | Kegunaan                |
+| ---------------------------------------- | ----------------------- |
+| `/login`                                 | Login                   |
+| `/register`                              | Registrasi              |
+| `/projects`                              | Daftar project          |
+| `/projects/[projectId]`                  | Overview project        |
+| `/projects/[projectId]/board`            | Kanban board            |
+| `/projects/[projectId]/issues`           | Issue list              |
+| `/projects/[projectId]/issues/[issueId]` | Issue detail            |
+| `/projects/[projectId]/members`          | Project members         |
+| `/projects/[projectId]/settings`         | Project settings        |
+| `/settings/profile`                      | User profile settings   |
+| `/admin`                                 | Platform admin overview |
+| `/admin/users`                           | Platform user directory |
+| `/admin/users/[userId]`                  | Platform user detail    |
 
 ## Permission matrix
 

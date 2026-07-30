@@ -1,4 +1,5 @@
 export type ProjectRole = "owner" | "admin" | "member" | "viewer";
+export type PlatformRole = "user" | "superadmin";
 export type IssueType = "task" | "bug" | "feature";
 export type IssueStatus =
   | "backlog"
@@ -13,8 +14,44 @@ export type User = {
   name: string;
   email: string;
   avatar_url: string | null;
+  platform_role?: PlatformRole;
+  is_active?: boolean;
+  last_login_at?: string | null;
+  deactivated_at?: string | null;
+  deleted_at?: string | null;
   created_at?: string;
   updated_at?: string;
+};
+
+export type AdminUser = User & {
+  platform_role: PlatformRole;
+  is_active: boolean;
+  last_login_at: string | null;
+  deactivated_at: string | null;
+  deleted_at: string | null;
+  deactivation_reason?: string | null;
+  owned_projects: number;
+  member_projects: number;
+  reported_issues: number;
+};
+
+export type AdminOverview = {
+  total_users: number;
+  active_users: number;
+  inactive_users: number;
+  deleted_users: number;
+  new_users_7d: number;
+  active_users_7d: number;
+  total_projects: number;
+  active_issues: number;
+};
+
+export type AdminUserStatus = "all" | "active" | "inactive" | "deleted";
+export type AdminUserFilters = {
+  search?: string;
+  status?: AdminUserStatus;
+  page?: number;
+  per_page?: number;
 };
 
 export type Project = {

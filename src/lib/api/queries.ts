@@ -1,4 +1,4 @@
-import type { IssueFilters } from "@/types";
+import type { AdminUserFilters, IssueFilters } from "@/types";
 
 export const queryKeys = {
   me: () => ["me"] as const,
@@ -16,4 +16,9 @@ export const queryKeys = {
       ["issues", projectId, issueId, "activities"] as const,
   },
   dashboard: (projectId: string) => ["dashboard", projectId] as const,
+  admin: {
+    overview: () => ["admin", "overview"] as const,
+    users: (filters: AdminUserFilters) => ["admin", "users", filters] as const,
+    user: (id: string) => ["admin", "user", id] as const,
+  },
 };

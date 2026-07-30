@@ -6,6 +6,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, LockKeyhole, UserRound } from "lucide-react";
+import { BrandMark } from "@/components/shared/brand-mark";
+import { DemoLoginButton } from "@/features/auth/components/demo-login-button";
 import { Button, FieldError, Input, Label } from "@/components/ui";
 import { ApiError } from "@/lib/api/client";
 import { resources } from "@/lib/api/resources";
@@ -28,27 +30,25 @@ export function AuthFrame({
       <div className="mx-auto flex min-h-screen max-w-6xl">
         <aside className="relative hidden w-[42%] overflow-hidden bg-slate-950 p-10 text-white lg:flex lg:flex-col lg:justify-between">
           <div className="relative z-10 flex items-center gap-2 text-sm font-semibold tracking-tight">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-indigo-500 font-bold">
-              IF
-            </span>
+            <BrandMark />
             Tracklume
           </div>
           <div className="relative z-10 max-w-sm">
             <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">
-              Your team, in motion
+              A clearer way to work
             </p>
             <h1 className="text-4xl font-semibold leading-tight tracking-tight">
-              Turn the backlog into visible progress.
+              Keep the work moving.
             </h1>
             <p className="mt-5 text-sm leading-6 text-slate-300">
-              Track tasks, bugs, and product ideas clearly.
+              Track tasks, bugs, and product ideas in one calm workspace.
             </p>
             <p className="mt-2 text-sm leading-6 text-slate-400">
               Kelola tugas, bug, dan ide produk dengan lebih terarah.
             </p>
           </div>
           <div className="relative z-10 text-xs text-slate-400">
-            Private workspaces · Clear ownership · Calm execution
+            Clear ownership · Fewer loose ends
           </div>
           <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full border border-indigo-400/30 bg-indigo-500/20 blur-3xl" />
           <div className="absolute right-16 top-20 h-56 w-56 rounded-full border border-cyan-300/10" />
@@ -57,9 +57,7 @@ export function AuthFrame({
           <div className="w-full max-w-sm">
             <div className="mb-10 lg:hidden">
               <div className="flex items-center gap-2 text-sm font-semibold">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-xs text-white">
-                  IF
-                </span>
+                <BrandMark />
                 Tracklume
               </div>
             </div>
@@ -116,9 +114,11 @@ export function LoginForm() {
         <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-2 text-primary">
           <LockKeyhole className="h-5 w-5" />
         </div>
-        <h2 className="text-2xl font-semibold tracking-tight">Welcome back</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">
+          Sign in to Tracklume
+        </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Sign in to pick up where your team left off.
+          See what needs attention and keep work moving.
         </p>
       </div>
       <form
@@ -132,7 +132,7 @@ export function LoginForm() {
             id="email"
             type="email"
             autoComplete="email"
-            placeholder="you@company.com"
+            placeholder="name@company.com"
             {...form.register("email")}
           />
           <FieldError>{form.formState.errors.email?.message}</FieldError>
@@ -140,9 +140,6 @@ export function LoginForm() {
         <div>
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
-            <span className="text-xs text-muted-foreground">
-              Secure sign in
-            </span>
           </div>
           <Input
             id="password"
@@ -159,7 +156,7 @@ export function LoginForm() {
             role="alert"
           >
             {mutation.error instanceof ApiError
-              ? mutation.error.message
+              ? authErrorMessage(mutation.error, "We couldn't sign you in.")
               : "Unable to sign in. Try again."}
           </p>
         )}
@@ -169,11 +166,12 @@ export function LoginForm() {
       </form>
       {process.env.NODE_ENV === "development" && (
         <div className="mt-6 rounded-lg border border-dashed border-border bg-muted/50 p-3 text-xs text-muted-foreground">
-          <strong className="text-foreground">Development demo</strong>
+          <strong className="text-foreground">Local development seed</strong>
           <br />
-          owner@issueflow.local · Password123!
+          owner@tracklume.local · Password123!
         </div>
       )}
+      <DemoLoginButton className="mt-3" />
     </AuthFrame>
   );
 }
@@ -200,10 +198,10 @@ export function RegisterForm() {
           <UserRound className="h-5 w-5" />
         </div>
         <h2 className="text-2xl font-semibold tracking-tight">
-          Create your workspace access
+          Create your Tracklume account
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Start with a clear place for every task, bug, and idea.
+          Give your team one place for tasks, bugs, and product ideas.
         </p>
       </div>
       <form
@@ -227,7 +225,7 @@ export function RegisterForm() {
             id="register-email"
             type="email"
             autoComplete="email"
-            placeholder="you@company.com"
+            placeholder="name@company.com"
             {...form.register("email")}
           />
           <FieldError>{form.formState.errors.email?.message}</FieldError>
@@ -261,7 +259,10 @@ export function RegisterForm() {
             role="alert"
           >
             {mutation.error instanceof ApiError
-              ? mutation.error.message
+              ? authErrorMessage(
+                  mutation.error,
+                  "We couldn't create your account.",
+                )
               : "Unable to create your account."}
           </p>
         )}
@@ -275,4 +276,16 @@ export function RegisterForm() {
       </form>
     </AuthFrame>
   );
+}
+
+function authErrorMessage(error: ApiError, fallback: string) {
+  if (error.code === "ACCOUNT_INACTIVE")
+    return "Your account is inactive. Please contact support.";
+  if (error.code === "CONFLICT")
+    return "An account with this email already exists. Sign in instead.";
+  if (error.status === 422)
+    return "Check the highlighted fields and try again.";
+  if (error.status === 503)
+    return "Tracklume is temporarily unavailable. Try again shortly.";
+  return `${fallback} Try again.`;
 }

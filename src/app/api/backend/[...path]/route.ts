@@ -2,10 +2,12 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 const cookieName = process.env.AUTH_COOKIE_NAME || "tracklume_session";
+const publicApiUrl =
+  process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
 const backendUrl =
   (process.env.NODE_ENV === "development"
-    ? process.env.NEXT_PUBLIC_API_URL || process.env.INTERNAL_API_URL
-    : process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL) ||
+    ? publicApiUrl || process.env.INTERNAL_API_URL
+    : process.env.INTERNAL_API_URL || publicApiUrl) ||
   "http://localhost:8080/api/v1";
 
 function tokenFrom(body: unknown) {

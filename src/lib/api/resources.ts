@@ -1,6 +1,9 @@
-import { apiCollection, apiFetch } from "./client";
+import { apiCollection, apiFetch, appFetch } from "./client";
 import type {
   Activity,
+  AdminOverview,
+  AdminUser,
+  AdminUserFilters,
   Dashboard,
   Issue,
   IssueFilters,
@@ -74,6 +77,7 @@ export const resources = {
       method: "POST",
       body: JSON.stringify(body),
     }),
+  demoLogin: () => appFetch<User>("auth/demo", { method: "POST" }),
   register: (body: { name: string; email: string; password: string }) =>
     apiFetch<User>("auth/register", {
       method: "POST",
@@ -198,4 +202,20 @@ export const resources = {
       method: "PUT",
       body: JSON.stringify(body),
     }),
+  adminOverview: () => apiFetch<AdminOverview>("admin/overview"),
+  adminUsers: (filters: AdminUserFilters) =>
+    apiCollection<AdminUser>("admin/users", filters),
+  adminUser: (userId: string) => apiFetch<AdminUser>(`admin/users/${userId}`),
+  updateAdminUserStatus: (
+    userId: string,
+    body: { is_active: boolean; reason?: string },
+  ) =>
+    apiFetch<AdminUser>(`admin/users/${userId}/status`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  deleteAdminUser: (userId: string) =>
+    apiFetch<null>(`admin/users/${userId}`, { method: "DELETE" }),
+  restoreAdminUser: (userId: string) =>
+    apiFetch<AdminUser>(`admin/users/${userId}/restore`, { method: "POST" }),
 };
