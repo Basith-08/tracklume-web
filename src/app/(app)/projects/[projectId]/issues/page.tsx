@@ -76,7 +76,7 @@ export default function IssuesPage() {
       <PageHeader
         eyebrow="Issues"
         title="All issues"
-        description="Search, filter, and sort the complete project backlog."
+        description="Find, filter, and sort every issue in this project."
         action={
           <Button onClick={() => setCreate(true)}>
             <Plus className="h-4 w-4" />
@@ -111,10 +111,10 @@ export default function IssuesPage() {
               updateFilters({ status: e.target.value as IssueStatus | "all" })
             }
           >
-            <option value="all">All status</option>
+            <option value="all">All statuses</option>
             <option value="backlog">Backlog</option>
-            <option value="todo">To do</option>
-            <option value="in_progress">In progress</option>
+            <option value="todo">To Do</option>
+            <option value="in_progress">In Progress</option>
             <option value="done">Done</option>
             <option value="cancelled">Cancelled</option>
           </Select>
@@ -127,7 +127,7 @@ export default function IssuesPage() {
               })
             }
           >
-            <option value="all">All priority</option>
+            <option value="all">All priorities</option>
             <option value="urgent">Urgent</option>
             <option value="high">High</option>
             <option value="medium">Medium</option>
@@ -183,11 +183,13 @@ export default function IssuesPage() {
       ) : query.data?.data.length === 0 ? (
         <EmptyState
           icon={Filter}
-          title={activeFilters ? "No matching issues" : "No issues yet"}
+          title={
+            activeFilters ? "No issues match these filters" : "No issues yet"
+          }
           description={
             activeFilters
-              ? "Try clearing a filter or changing your search."
-              : "Create the first issue for this project."
+              ? "Clear a filter or try a different search."
+              : "Create the first issue to give this project a clear next step."
           }
           action={
             !activeFilters && (

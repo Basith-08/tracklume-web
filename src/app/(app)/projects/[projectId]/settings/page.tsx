@@ -43,7 +43,7 @@ export default function ProjectSettingsPage() {
       <PageHeader
         eyebrow="Configuration"
         title="Project settings"
-        description="Keep project context and lifecycle state up to date."
+        description="Update project details or archive this project."
         action={
           canManage && (
             <Button variant="outline" onClick={() => setEditing(true)}>
@@ -76,8 +76,8 @@ export default function ProjectSettingsPage() {
             <div className="flex-1">
               <h2 className="font-semibold">Danger zone</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                The backend DELETE operation archives this project. It stays
-                stored but leaves the active project list.
+                Archiving removes this project from active workflows while
+                keeping its issues and activity history.
               </p>
               {canManage && (
                 <Button

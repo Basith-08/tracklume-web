@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Avatar, Button, Spinner } from "@/components/ui";
+import { BrandMark } from "@/components/shared/brand-mark";
 import { resources } from "@/lib/api/resources";
 import { queryKeys } from "@/lib/api/queries";
 import { cn } from "@/lib/utils/cn";
@@ -98,9 +99,7 @@ export function AppShell({
             href="/projects"
             className="flex items-center gap-2 text-sm font-bold tracking-tight"
           >
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-xs text-white">
-              IF
-            </span>
+            <BrandMark />
             Tracklume
           </Link>
           <button

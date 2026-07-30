@@ -133,8 +133,8 @@ export default function BoardPage() {
     <>
       <PageHeader
         eyebrow="Board"
-        title="Delivery board"
-        description="Move issues through the workflow. Changes save as you drop."
+        title="Board"
+        description="Move an issue to update its status. Changes save when you drop it."
         action={
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -144,7 +144,7 @@ export default function BoardPage() {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setSearch(e.target.value)
               }
-              placeholder="Find an issue"
+              placeholder="Search this board"
               aria-label="Search board"
             />
           </div>
@@ -157,8 +157,8 @@ export default function BoardPage() {
         />
       ) : !issues.length ? (
         <EmptyState
-          title="Nothing on the board"
-          description="Create an issue to give this project a visible next step."
+          title="No issues on the board"
+          description="Create an issue or clear your search to see work here."
         />
       ) : (
         <DndContext

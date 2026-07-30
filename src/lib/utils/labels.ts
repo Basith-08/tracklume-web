@@ -7,8 +7,8 @@ import type {
 
 export const statusLabels: Record<IssueStatus, string> = {
   backlog: "Backlog",
-  todo: "To do",
-  in_progress: "In progress",
+  todo: "To Do",
+  in_progress: "In Progress",
   done: "Done",
   cancelled: "Cancelled",
 };

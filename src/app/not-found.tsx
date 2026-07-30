@@ -5,7 +5,7 @@ export default function NotFound() {
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
         404
       </p>
-      <h1 className="text-2xl font-semibold">This view went missing</h1>
+      <h1 className="text-2xl font-semibold">Page not found</h1>
       <p className="text-sm text-muted-foreground">
         The page may have moved or you may not have access to it.
       </p>

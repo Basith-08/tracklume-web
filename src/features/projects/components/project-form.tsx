@@ -99,7 +99,7 @@ export function ProjectForm({
             />
             <p className="mt-1.5 text-xs text-muted-foreground">
               {project ? (
-                "Project keys cannot be changed by the current backend contract."
+                "Project keys cannot be changed after the project is created."
               ) : (
                 <>
                   Issues will look like{" "}
@@ -116,7 +116,7 @@ export function ProjectForm({
             <Label htmlFor="project-description">Description</Label>
             <Textarea
               id="project-description"
-              placeholder="What is this project responsible for?"
+              placeholder="What is this project about?"
               {...form.register("description")}
             />
             <FieldError>
