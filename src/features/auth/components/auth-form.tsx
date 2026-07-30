@@ -6,6 +6,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, LockKeyhole, UserRound } from "lucide-react";
+import { BrandMark } from "@/components/shared/brand-mark";
+import { DemoLoginButton } from "@/features/auth/components/demo-login-button";
 import { Button, FieldError, Input, Label } from "@/components/ui";
 import { BrandMark } from "@/components/shared/brand-mark";
 import { ApiError } from "@/lib/api/client";
@@ -173,9 +175,10 @@ export function LoginForm() {
         <div className="mt-6 rounded-lg border border-dashed border-border bg-muted/50 p-3 text-xs text-muted-foreground">
           <strong className="text-foreground">Demo account</strong>
           <br />
-          owner@issueflow.local · Password123!
+          owner@tracklume.local · Password123!
         </div>
       )}
+      <DemoLoginButton className="mt-3" />
     </AuthFrame>
   );
 }
@@ -277,4 +280,16 @@ export function RegisterForm() {
       </form>
     </AuthFrame>
   );
+}
+
+function authErrorMessage(error: ApiError, fallback: string) {
+  if (error.code === "ACCOUNT_INACTIVE")
+    return "Your account is inactive. Please contact support.";
+  if (error.code === "CONFLICT")
+    return "An account with this email already exists. Sign in instead.";
+  if (error.status === 422)
+    return "Check the highlighted fields and try again.";
+  if (error.status === 503)
+    return "Tracklume is temporarily unavailable. Try again shortly.";
+  return `${fallback} Try again.`;
 }

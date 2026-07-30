@@ -21,6 +21,7 @@ import {
 import { PageHeader } from "@/components/shared/page-state";
 import { queryKeys } from "@/lib/api/queries";
 import { resources } from "@/lib/api/resources";
+import { ApiError } from "@/lib/api/client";
 import { canManageMembers } from "@/lib/auth/permissions";
 import { memberSchema } from "@/lib/validation/schemas";
 import { formatDate } from "@/lib/utils/date";
@@ -101,6 +102,13 @@ export default function MembersPage() {
             <UserPlus className="h-4 w-4" />
             Add member
           </Button>
+          {add.error && (
+            <p className="text-xs text-destructive sm:col-span-3" role="alert">
+              {add.error instanceof ApiError && add.error.status === 404
+                ? "User not found. Ask them to create an account first."
+                : "We couldn't add this member. Check the email and try again."}
+            </p>
+          )}
         </form>
       )}
       {members.isLoading ? (

@@ -40,6 +40,7 @@ type ParsedResponse = ApiErrorShape & {
 async function request(
   path: string,
   init: RequestInit = {},
+  prefix = "/api/backend/",
 ): Promise<ParsedResponse | null> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 15_000);
@@ -47,7 +48,7 @@ async function request(
     ? AbortSignal.any([init.signal, controller.signal])
     : controller.signal;
   try {
-    const response = await fetch(`/api/backend/${path.replace(/^\//, "")}`, {
+    const response = await fetch(`${prefix}${path.replace(/^\//, "")}`, {
       ...init,
       signal,
       headers: {
@@ -87,6 +88,14 @@ export async function apiFetch<T>(
   init: RequestInit = {},
 ): Promise<T> {
   const body = await request(path, init);
+  return (body && "data" in body ? body.data : body) as T;
+}
+
+export async function appFetch<T>(
+  path: string,
+  init: RequestInit = {},
+): Promise<T> {
+  const body = await request(path, init, "/api/");
   return (body && "data" in body ? body.data : body) as T;
 }
 

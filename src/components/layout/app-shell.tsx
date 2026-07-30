@@ -16,6 +16,7 @@ import {
   Moon,
   Plus,
   Settings,
+  ShieldCheck,
   Sun,
   Users,
   X,
@@ -139,6 +140,26 @@ export function AppShell({
                 </Link>
               ))}
             </nav>
+          </div>
+        )}
+        {user.platform_role === "superadmin" && (
+          <div className="mt-5 px-3">
+            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Platform
+            </p>
+            <Link
+              href="/admin"
+              onClick={() => setOpen(false)}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition",
+                pathname.startsWith("/admin")
+                  ? "bg-primary/10 font-semibold text-primary"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              <ShieldCheck className="h-4 w-4" />
+              Admin console
+            </Link>
           </div>
         )}
         <div className="mt-auto border-t border-border p-3">

@@ -1,4 +1,7 @@
-import type { ProjectRole } from "@/types";
+import type { PlatformRole, ProjectRole } from "@/types";
+
+export const isPlatformAdmin = (role?: PlatformRole | null) =>
+  role === "superadmin";
 
 export const canManageProject = (role: ProjectRole) =>
   role === "owner" || role === "admin";
