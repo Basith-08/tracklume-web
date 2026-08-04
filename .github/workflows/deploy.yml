@@ -1,0 +1,84 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit SHA to redeploy (rollback)"
+        required: false
+
+concurrency:
+  group: deploy-tracklume-web
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: |
+          source build.env
+          docker run --rm -v "$GITHUB_WORKSPACE:/app" -w /app "$BUILD_IMAGE" \
+            sh -c "$INSTALL_COMMAND && $TEST_COMMAND"
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha || github.sha }}
+
+      - name: Resolve deploy SHA
+        id: sha
+        run: echo "sha=${{ inputs.sha || github.sha }}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        run: |
+          source build.env
+          image_owner="$(printf '%s' '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+          docker build \
+            --file "$DOCKERFILE" \
+            --build-arg "BUILD_IMAGE=$BUILD_IMAGE" \
+            --build-arg "RUNTIME_IMAGE=$RUNTIME_IMAGE" \
+            --build-arg "INSTALL_COMMAND=$INSTALL_COMMAND" \
+            --build-arg "BUILD_COMMAND=$BUILD_COMMAND" \
+            --build-arg "RUNTIME_PREPARE_COMMAND=$RUNTIME_PREPARE_COMMAND" \
+            --build-arg "START_COMMAND=$START_COMMAND" \
+            -t "ghcr.io/${image_owner}/tracklume-web:${{ steps.sha.outputs.sha }}" .
+          docker push "ghcr.io/${image_owner}/tracklume-web:${{ steps.sha.outputs.sha }}"
+
+      - name: Sync production compose file
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_DEPLOY_USER }}
+          key: ${{ secrets.PROD_DEPLOY_KEY }}
+          source: compose.yaml
+          target: /srv/apps/tracklume-web
+          overwrite: true
+
+      - name: Restart production service
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_DEPLOY_USER }}
+          key: ${{ secrets.PROD_DEPLOY_KEY }}
+          script: |
+            cd /srv/apps/tracklume-web
+            sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=${{ steps.sha.outputs.sha }}|" .env
+            docker compose pull
+            docker compose up -d --force-recreate
