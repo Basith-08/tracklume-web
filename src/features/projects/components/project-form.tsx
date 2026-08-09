@@ -47,7 +47,7 @@ export function ProjectForm({
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <section
-        className="w-full border-border bg-surface p-6 shadow-2xl sm:max-w-lg sm:rounded-2xl sm:border"
+        className="max-h-[94vh] w-full overflow-y-auto border-border bg-surface p-6 shadow-2xl sm:max-w-lg sm:rounded-2xl sm:border"
         role="dialog"
         aria-modal="true"
         aria-labelledby="project-form-title"

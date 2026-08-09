@@ -86,7 +86,7 @@ export default function OverviewPage() {
                 </div>
                 <CircleDot className="h-5 w-5 text-primary" />
               </div>
-              <div className="grid gap-7 md:grid-cols-[minmax(190px,0.8fr)_minmax(0,1.2fr)] md:items-center">
+              <div className="grid gap-7 xl:grid-cols-[minmax(190px,0.8fr)_minmax(0,1.2fr)] xl:items-center">
                 <StatusDonut
                   items={Object.entries(data.by_status).map(([key, value]) => ({
                     label: statusLabels[key as IssueStatus],
@@ -190,7 +190,7 @@ function StatusDonut({
     : "hsl(var(--muted))";
 
   return (
-    <div className="flex items-center gap-5 md:flex-col md:items-start md:gap-4">
+    <div className="flex items-center gap-5 xl:flex-col xl:items-start xl:gap-4">
       <div
         className="relative h-36 w-36 shrink-0 rounded-full"
         style={{ background }}
@@ -202,7 +202,7 @@ function StatusDonut({
           <span className="text-[11px] text-muted-foreground">issues</span>
         </div>
       </div>
-      <div className="grid w-full grid-cols-2 gap-x-4 gap-y-2 text-xs md:grid-cols-1">
+      <div className="grid w-full grid-cols-2 gap-x-4 gap-y-2 text-xs xl:grid-cols-1">
         {items.map((item) => (
           <div key={item.tone} className="flex items-center gap-2">
             <span

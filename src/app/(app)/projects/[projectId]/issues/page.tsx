@@ -251,42 +251,63 @@ function IssueRow({
   return (
     <Link
       href={`/projects/${projectId}/issues/${issue.id}`}
-      className="grid items-center gap-3 border-b border-border px-4 py-3.5 last:border-0 hover:bg-muted/40 md:grid-cols-[100px_minmax(220px,1fr)_110px_120px_110px_150px_110px]"
+      className="block border-b border-border px-4 py-3.5 last:border-0 hover:bg-muted/40 md:grid md:items-center md:gap-3 md:grid-cols-[100px_minmax(220px,1fr)_110px_120px_110px_150px_110px]"
     >
-      <span className="text-xs font-semibold text-primary">
-        {issue.identifier}
-      </span>
-      <span className="min-w-0 truncate text-sm font-medium">
-        {issue.title}
-      </span>
-      <span>
-        <TypeBadge type={issue.type} />
-      </span>
-      <span>
-        <StatusBadge status={issue.status} />
-      </span>
-      <span>
-        <PriorityBadge priority={issue.priority} />
-      </span>
-      <span className="flex items-center gap-2 text-xs text-muted-foreground">
-        {assignee ? (
-          <>
-            <Avatar user={assignee} size="sm" />
-            <span className="max-w-20 truncate">{assignee.name}</span>
-          </>
-        ) : (
-          "Unassigned"
-        )}
-      </span>
-      <span
-        className={
-          isOverdue(issue.due_date)
-            ? "text-xs font-medium text-destructive"
-            : "text-xs text-muted-foreground"
-        }
-      >
-        {formatDate(issue.due_date, { month: "short", day: "numeric" })}
-      </span>
+      <div className="flex items-start justify-between gap-3 md:contents">
+        <span className="text-xs font-semibold text-primary">
+          {issue.identifier}
+        </span>
+        <span className="min-w-0 flex-1 truncate text-right text-sm font-medium md:text-left">
+          {issue.title}
+        </span>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-border pt-3 md:contents">
+        <span className="flex items-center justify-between gap-2 md:block">
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground md:hidden">
+            Type
+          </span>
+          <TypeBadge type={issue.type} />
+        </span>
+        <span className="flex items-center justify-between gap-2 md:block">
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground md:hidden">
+            Status
+          </span>
+          <StatusBadge status={issue.status} />
+        </span>
+        <span className="flex items-center justify-between gap-2 md:block">
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground md:hidden">
+            Priority
+          </span>
+          <PriorityBadge priority={issue.priority} />
+        </span>
+        <span className="flex min-w-0 items-center justify-between gap-2 text-xs text-muted-foreground md:block">
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground md:hidden">
+            Assignee
+          </span>
+          <span className="flex min-w-0 items-center gap-2">
+            {assignee ? (
+              <>
+                <Avatar user={assignee} size="sm" />
+                <span className="max-w-20 truncate">{assignee.name}</span>
+              </>
+            ) : (
+              "Unassigned"
+            )}
+          </span>
+        </span>
+        <span
+          className={
+            isOverdue(issue.due_date)
+              ? "flex items-center justify-between gap-2 text-xs font-medium text-destructive md:block"
+              : "flex items-center justify-between gap-2 text-xs text-muted-foreground md:block"
+          }
+        >
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground md:hidden">
+            Due
+          </span>
+          {formatDate(issue.due_date, { month: "short", day: "numeric" })}
+        </span>
+      </div>
     </Link>
   );
 }

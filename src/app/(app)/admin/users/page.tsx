@@ -181,18 +181,30 @@ function UserRow({
           </span>
         </span>
       </Link>
-      <div>
+      <div className="flex items-center justify-between gap-2 md:block">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground md:hidden">
+          Status
+        </span>
         <AccountStatus user={user} />
       </div>
-      <span className="text-xs text-muted-foreground">
+      <span className="flex items-center justify-between gap-2 text-xs text-muted-foreground md:block">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground md:hidden">
+          Role
+        </span>
         {user.platform_role}
       </span>
-      <span className="text-xs text-muted-foreground">
+      <span className="flex items-center justify-between gap-2 text-xs text-muted-foreground md:block">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground md:hidden">
+          Last login
+        </span>
         {formatDate(user.last_login_at)}
       </span>
-      <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-        <span>{user.owned_projects + user.member_projects}</span>
-        <div className="flex items-center gap-1">
+      <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground md:block">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground md:hidden">
+          Projects
+        </span>
+        <div className="flex items-center justify-between gap-2 md:justify-end">
+          <span>{user.owned_projects + user.member_projects}</span>
           <Link href={`/admin/users/${user.id}`}>
             <Button
               variant="ghost"
