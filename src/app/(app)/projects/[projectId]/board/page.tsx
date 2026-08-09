@@ -56,6 +56,10 @@ export default function BoardPage() {
     queryKey: queryKeys.issues.list(projectId, filters),
     queryFn: () => resources.issues(projectId, filters),
   });
+  const members = useQuery({
+    queryKey: queryKeys.members.list(projectId),
+    queryFn: () => resources.members(projectId),
+  });
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, {
@@ -96,11 +100,18 @@ export default function BoardPage() {
     onSettled: () =>
       client.invalidateQueries({ queryKey: ["issues", projectId] }),
   });
-  const issues = (query.data?.data ?? []).filter(
-    (issue) =>
-      issue.title.toLowerCase().includes(search.toLowerCase()) ||
-      issue.identifier.toLowerCase().includes(search.toLowerCase()),
-  );
+  const issues = (query.data?.data ?? [])
+    .filter(
+      (issue) =>
+        issue.title.toLowerCase().includes(search.toLowerCase()) ||
+        issue.identifier.toLowerCase().includes(search.toLowerCase()),
+    )
+    .map((issue) => ({
+      ...issue,
+      assignee:
+        issue.assignee ??
+        members.data?.data.find((member) => member.id === issue.assignee_id),
+    }));
   const onDragStart = ({ active }: DragStartEvent) =>
     setActive(issues.find((issue) => issue.id === String(active.id)));
   const onDragEnd = ({ active, over }: DragEndEvent) => {

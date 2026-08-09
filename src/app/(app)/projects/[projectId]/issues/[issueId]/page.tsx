@@ -24,6 +24,7 @@ import {
   Avatar,
   EmptyState,
 } from "@/components/ui";
+import { MarkdownContent } from "@/components/shared/markdown-content";
 import { IssueForm } from "@/features/issues/components/issue-form";
 import { queryKeys } from "@/lib/api/queries";
 import { resources } from "@/lib/api/resources";
@@ -52,6 +53,10 @@ export default function IssueDetailPage() {
   const project = useQuery({
     queryKey: queryKeys.projects.detail(projectId),
     queryFn: () => resources.project(projectId),
+  });
+  const members = useQuery({
+    queryKey: queryKeys.members.list(projectId),
+    queryFn: () => resources.members(projectId),
   });
   const update = useMutation({
     mutationFn: (body: unknown) =>
@@ -85,6 +90,12 @@ export default function IssueDetailPage() {
       />
     );
   const data = issue.data;
+  const assignee =
+    data.assignee ??
+    members.data?.data.find((member) => member.id === data.assignee_id);
+  const reporter =
+    data.reporter ??
+    members.data?.data.find((member) => member.id === data.reporter_id);
   const canEdit = project.data
     ? canEditIssue(project.data.current_user_role)
     : false;
@@ -134,9 +145,13 @@ export default function IssueDetailPage() {
             <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Description
             </h2>
-            <p className="whitespace-pre-wrap text-sm leading-7 text-foreground">
-              {data.description || "No description added."}
-            </p>
+            {data.description ? (
+              <MarkdownContent content={data.description} />
+            ) : (
+              <p className="text-sm leading-7 text-muted-foreground">
+                No description added.
+              </p>
+            )}
           </div>
           <div className="mt-8">
             <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold">
@@ -198,10 +213,10 @@ export default function IssueDetailPage() {
           </DetailRow>
           <DetailRow label="Assignee">
             <span className="flex items-center gap-2 text-sm">
-              {data.assignee ? (
+              {assignee ? (
                 <>
-                  <Avatar user={data.assignee} size="sm" />
-                  {data.assignee.name}
+                  <Avatar user={assignee} size="sm" />
+                  {assignee.name}
                 </>
               ) : (
                 "Unassigned"
@@ -210,10 +225,10 @@ export default function IssueDetailPage() {
           </DetailRow>
           <DetailRow label="Reporter">
             <span className="flex items-center gap-2 text-sm">
-              {data.reporter ? (
+              {reporter ? (
                 <>
-                  <Avatar user={data.reporter} size="sm" />
-                  {data.reporter.name}
+                  <Avatar user={reporter} size="sm" />
+                  {reporter.name}
                 </>
               ) : (
                 "—"

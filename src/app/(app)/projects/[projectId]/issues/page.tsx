@@ -29,6 +29,7 @@ import type {
   IssuePriority,
   IssueStatus,
   IssueType,
+  ProjectMember,
 } from "@/types";
 
 export default function IssuesPage() {
@@ -213,7 +214,12 @@ export default function IssuesPage() {
               <span>Due</span>
             </div>
             {query.data?.data.map((issue) => (
-              <IssueRow key={issue.id} issue={issue} projectId={projectId} />
+              <IssueRow
+                key={issue.id}
+                issue={issue}
+                projectId={projectId}
+                members={members.data?.data ?? []}
+              />
             ))}
           </div>
           <Pagination
@@ -233,10 +239,15 @@ export default function IssuesPage() {
 function IssueRow({
   issue,
   projectId,
+  members,
 }: {
   issue: import("@/types").Issue;
   projectId: string;
+  members: ProjectMember[];
 }) {
+  const assignee =
+    issue.assignee ?? members.find((member) => member.id === issue.assignee_id);
+
   return (
     <Link
       href={`/projects/${projectId}/issues/${issue.id}`}
@@ -258,10 +269,10 @@ function IssueRow({
         <PriorityBadge priority={issue.priority} />
       </span>
       <span className="flex items-center gap-2 text-xs text-muted-foreground">
-        {issue.assignee ? (
+        {assignee ? (
           <>
-            <Avatar user={issue.assignee} size="sm" />
-            <span className="max-w-20 truncate">{issue.assignee.name}</span>
+            <Avatar user={assignee} size="sm" />
+            <span className="max-w-20 truncate">{assignee.name}</span>
           </>
         ) : (
           "Unassigned"
