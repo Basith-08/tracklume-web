@@ -79,40 +79,45 @@ export default function OverviewPage() {
             <div className="rounded-xl border border-border bg-surface p-5">
               <div className="mb-5 flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold">Work breakdown</h2>
+                  <h2 className="font-semibold">Work mix</h2>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Where issues sit across this project.
+                    See status at a glance, then compare priority and type.
                   </p>
                 </div>
                 <CircleDot className="h-5 w-5 text-primary" />
               </div>
-              <Distribution
-                title="Status"
-                items={Object.entries(data.by_status).map(([key, value]) => ({
-                  label: statusLabels[key as IssueStatus],
-                  value,
-                  tone: key,
-                }))}
-                total={data.total_issues}
-              />
-              <Distribution
-                title="Priority"
-                items={Object.entries(data.by_priority).map(([key, value]) => ({
-                  label: priorityLabels[key as IssuePriority],
-                  value,
-                  tone: key,
-                }))}
-                total={data.total_issues}
-              />
-              <Distribution
-                title="Type"
-                items={Object.entries(data.by_type).map(([key, value]) => ({
-                  label: typeLabels[key as IssueType],
-                  value,
-                  tone: key,
-                }))}
-                total={data.total_issues}
-              />
+              <div className="grid gap-7 md:grid-cols-[minmax(190px,0.8fr)_minmax(0,1.2fr)] md:items-center">
+                <StatusDonut
+                  items={Object.entries(data.by_status).map(([key, value]) => ({
+                    label: statusLabels[key as IssueStatus],
+                    value,
+                    tone: key as IssueStatus,
+                  }))}
+                  total={data.total_issues}
+                />
+                <div>
+                  <Distribution
+                    title="Priority"
+                    items={Object.entries(data.by_priority).map(
+                      ([key, value]) => ({
+                        label: priorityLabels[key as IssuePriority],
+                        value,
+                        tone: key,
+                      }),
+                    )}
+                    total={data.total_issues}
+                  />
+                  <Distribution
+                    title="Type"
+                    items={Object.entries(data.by_type).map(([key, value]) => ({
+                      label: typeLabels[key as IssueType],
+                      value,
+                      tone: key,
+                    }))}
+                    total={data.total_issues}
+                  />
+                </div>
+              </div>
             </div>
             <div className="rounded-xl border border-border bg-surface p-5">
               <div className="mb-5 flex items-center justify-between">
@@ -157,6 +162,62 @@ export default function OverviewPage() {
 
 function useProjectId() {
   return useParams<{ projectId: string }>().projectId;
+}
+function StatusDonut({
+  items,
+  total,
+}: {
+  items: { label: string; value: number; tone: IssueStatus }[];
+  total: number;
+}) {
+  const colors: Record<IssueStatus, string> = {
+    backlog: "#6366f1",
+    todo: "#94a3b8",
+    in_progress: "#f59e0b",
+    done: "#10b981",
+    cancelled: "#f43f5e",
+  };
+  let cursor = 0;
+  const segments = items
+    .filter((item) => item.value > 0)
+    .map((item) => {
+      const start = cursor;
+      cursor += (item.value / total) * 100;
+      return `${colors[item.tone]} ${start}% ${cursor}%`;
+    });
+  const background = total
+    ? `conic-gradient(${segments.join(", ")})`
+    : "hsl(var(--muted))";
+
+  return (
+    <div className="flex items-center gap-5 md:flex-col md:items-start md:gap-4">
+      <div
+        className="relative h-36 w-36 shrink-0 rounded-full"
+        style={{ background }}
+        role="img"
+        aria-label={`${total} total issues by status`}
+      >
+        <div className="absolute inset-4 flex flex-col items-center justify-center rounded-full bg-surface">
+          <span className="text-3xl font-semibold tracking-tight">{total}</span>
+          <span className="text-[11px] text-muted-foreground">issues</span>
+        </div>
+      </div>
+      <div className="grid w-full grid-cols-2 gap-x-4 gap-y-2 text-xs md:grid-cols-1">
+        {items.map((item) => (
+          <div key={item.tone} className="flex items-center gap-2">
+            <span
+              className="h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: colors[item.tone] }}
+            />
+            <span className="min-w-0 flex-1 truncate text-muted-foreground">
+              {item.label}
+            </span>
+            <span className="font-semibold">{item.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 function Metric({
   icon: Icon,
