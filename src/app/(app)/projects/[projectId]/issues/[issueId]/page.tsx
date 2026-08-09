@@ -162,23 +162,30 @@ export default function IssueDetailPage() {
               <Spinner />
             ) : activities.data?.data.length ? (
               <div className="space-y-4 border-l border-border pl-5">
-                {activities.data.data.map((activity) => (
-                  <div key={activity.id} className="relative">
-                    <span className="absolute -left-[25px] top-1.5 h-2 w-2 rounded-full bg-primary ring-4 ring-background" />
-                    <p className="text-sm">
-                      {activity.actor?.name ?? "Someone"}{" "}
-                      <span className="text-muted-foreground">
-                        {activity.action}
-                      </span>
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {formatDate(activity.created_at, {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      })}
-                    </p>
-                  </div>
-                ))}
+                {activities.data.data.map((activity) => {
+                  const actor =
+                    activity.actor ??
+                    members.data?.data.find(
+                      (member) => member.id === activity.actor_id,
+                    );
+                  return (
+                    <div key={activity.id} className="relative">
+                      <span className="absolute -left-[25px] top-1.5 h-2 w-2 rounded-full bg-primary ring-4 ring-background" />
+                      <p className="text-sm">
+                        {actor?.name ?? "Someone"}{" "}
+                        <span className="text-muted-foreground">
+                          {activity.action}
+                        </span>
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {formatDate(activity.created_at, {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <EmptyState

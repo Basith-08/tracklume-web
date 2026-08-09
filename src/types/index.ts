@@ -91,6 +91,7 @@ export type Issue = {
 
 export type Activity = {
   id: string;
+  actor_id: string;
   action: string;
   field?: string;
   old_value?: string | null;
