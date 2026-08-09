@@ -8,7 +8,9 @@ import {
   DragStartEvent,
   KeyboardSensor,
   PointerSensor,
-  closestCorners,
+  closestCenter,
+  pointerWithin,
+  type CollisionDetection,
   useDroppable,
   useSensor,
   useSensors,
@@ -37,16 +39,23 @@ import {
   Avatar,
 } from "@/components/ui";
 import { PageHeader } from "@/components/shared/page-state";
+import { IssueForm } from "@/features/issues/components/issue-form";
 import { queryKeys } from "@/lib/api/queries";
 import { resources } from "@/lib/api/resources";
 import { statusLabels, statusOrder } from "@/lib/utils/labels";
 import type { Issue, IssueStatus } from "@/types";
+
+const boardCollisionDetection: CollisionDetection = (args) => {
+  const pointerCollisions = pointerWithin(args);
+  return pointerCollisions.length ? pointerCollisions : closestCenter(args);
+};
 
 export default function BoardPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const client = useQueryClient();
   const [search, setSearch] = useState("");
   const [active, setActive] = useState<Issue>();
+  const [createStatus, setCreateStatus] = useState<IssueStatus>();
   const filters = {
     per_page: 100,
     sort: "updated_at" as const,
@@ -174,9 +183,10 @@ export default function BoardPage() {
       ) : (
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCorners}
+          collisionDetection={boardCollisionDetection}
           onDragStart={onDragStart}
           onDragEnd={onDragEnd}
+          onDragCancel={() => setActive(undefined)}
         >
           <div className="flex min-h-[calc(100vh-220px)] gap-3 overflow-x-auto pb-3">
             {statusOrder.map((status) => (
@@ -187,6 +197,7 @@ export default function BoardPage() {
                   .filter((issue) => issue.status === status)
                   .sort((a, b) => a.position - b.position)}
                 projectId={projectId}
+                onAdd={() => setCreateStatus(status)}
               />
             ))}
           </div>
@@ -197,6 +208,13 @@ export default function BoardPage() {
           </DragOverlay>
         </DndContext>
       )}
+      {createStatus && (
+        <IssueForm
+          projectId={projectId}
+          initialStatus={createStatus}
+          onClose={() => setCreateStatus(undefined)}
+        />
+      )}
     </>
   );
 }
@@ -205,10 +223,12 @@ function BoardColumn({
   status,
   issues,
   projectId,
+  onAdd,
 }: {
   status: IssueStatus;
   issues: Issue[];
   projectId: string;
+  onAdd: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
   return (
@@ -225,7 +245,9 @@ function BoardColumn({
           <span className="text-xs text-muted-foreground">{issues.length}</span>
         </div>
         <button
+          type="button"
           aria-label={`Add issue to ${statusLabels[status]}`}
+          onClick={onAdd}
           className="rounded p-1 text-muted-foreground hover:bg-surface"
         >
           <Plus className="h-4 w-4" />
@@ -265,7 +287,7 @@ function SortableIssue({
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
       {...listeners}
-      className={isDragging ? "opacity-40" : ""}
+      className={`touch-none select-none cursor-grab active:cursor-grabbing ${isDragging ? "opacity-40" : ""}`}
     >
       <IssueCard issue={issue} projectId={projectId} />
     </div>

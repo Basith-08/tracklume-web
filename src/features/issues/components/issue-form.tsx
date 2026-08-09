@@ -15,16 +15,18 @@ import {
 import { queryKeys } from "@/lib/api/queries";
 import { resources } from "@/lib/api/resources";
 import { issueSchema, type IssueInput } from "@/lib/validation/schemas";
-import type { Issue } from "@/types";
+import type { Issue, IssueStatus } from "@/types";
 
 export function IssueForm({
   projectId,
   issue,
+  initialStatus,
   onClose,
   onSaved,
 }: {
   projectId: string;
   issue?: Issue;
+  initialStatus?: IssueStatus;
   onClose: () => void;
   onSaved?: (issue: Issue) => void;
 }) {
@@ -39,7 +41,7 @@ export function IssueForm({
       title: issue?.title ?? "",
       description: issue?.description ?? "",
       type: issue?.type ?? "task",
-      status: issue?.status ?? "todo",
+      status: issue?.status ?? initialStatus ?? "todo",
       priority: issue?.priority ?? "medium",
       assignee_id: issue?.assignee_id ?? null,
       due_date: issue?.due_date?.slice(0, 10) ?? null,
